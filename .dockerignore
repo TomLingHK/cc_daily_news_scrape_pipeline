@@ -1,0 +1,52 @@
+# Docker ignore file - reduce build context and omit local artifacts
+
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+test_venv/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Test and local data
+# test_data.xlsx
+# test_data.csv
+test_*.py
+test_add_data.json
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python/runtime
+.python-version
+.pip-selfcheck.json
+
+# Environment files (often sensitive)
+.env
+.env.*
+stack.env
+
+# Logs
+*.log
+
+# Mounted / NAS data
+nas_data/
+NAS/
+
+# Dockerfile backups
+Dockerfile*
