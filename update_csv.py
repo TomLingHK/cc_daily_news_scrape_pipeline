@@ -31,10 +31,9 @@ def add_all_data(base_path, csv_template_path, input_list, txt_prefix, encoding=
     rows = []
     new_urls = []
     
-    # base_dir = os.path.dirname(csv_template_path) or '.'
     output_dir = os.path.join(base_path, 'output')
     
-    if not(os.path.exists(csv_template_path)):
+    if not os.path.exists(csv_template_path):
         raise FileNotFoundError(f"CSV file not found: {csv_template_path}")
 
     # Start with URLs recorded in ADDED_URL_TXT_PREFIX*.txt files
@@ -114,6 +113,9 @@ def update_csv_sheet(app_const, input_data_list=None, date=None, encoding='utf-8
     TXT_PREFIX = app_const['ADDED_URL_TXT_PREFIX']
     CSV_PREFIX = app_const['DAILY_NEWS_CSV_PREFIX']
     
+    year = date[:4]
+    month = date[4:6]
+    
     base = BASE_PATH or ''
     csv_template_path = os.path.join(base, 'csv_template.csv')
 
@@ -124,8 +126,14 @@ def update_csv_sheet(app_const, input_data_list=None, date=None, encoding='utf-8
     # Create timestamped result file name
     output_dir = os.path.join(base, 'output')
     csv_name = f'{CSV_PREFIX}{date}.csv'
-    csv_path = os.path.join(output_dir, csv_name)
+    year_dir = os.path.join(output_dir, year)
+    month_dir = os.path.join(year_dir, month)
+    csv_path = os.path.join(month_dir, csv_name)
     
+    if not os.path.exists(year_dir):
+        os.makedirs(year_dir, exist_ok=True)
+    if not os.path.exists(month_dir):
+        os.makedirs(month_dir, exist_ok=True)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir, exist_ok=True)
 
@@ -148,7 +156,7 @@ def update_csv_sheet(app_const, input_data_list=None, date=None, encoding='utf-8
         rows_added = len(df_new) if df_new is not None else 0
 
     # Write a timestamped file recording newly added URLs (if any) by appending
-    added_path = os.path.join(output_dir, f'{TXT_PREFIX}{date}.txt')
+    added_path = os.path.join(month_dir, f'{TXT_PREFIX}{date}.txt')
     return_msg = ""
     
     if new_urls:

@@ -18,9 +18,21 @@ def check_added_url(app_const, input_data_list=None, date=None):
     BASE_PATH = app_const['BASE_PATH']
     TXT_PREFIX = app_const['ADDED_URL_TXT_PREFIX']
     
-    base = BASE_PATH or ''
-    added_path = os.path.join(base, f'{TXT_PREFIX}{date}.txt')
+    year = date[:4]
+    month = date[4:6]
     
+    base = BASE_PATH or ''
+    
+    output_dir = os.path.join(base, 'output')
+    year_dir = os.path.join(output_dir, year)
+    month_dir = os.path.join(year_dir, month)
+    
+    if not os.path.exists(year_dir):
+        return {"data": input_data_list, "message": "Target file not found; returning original list."}
+    if not os.path.exists(month_dir):
+        return {"data": input_data_list, "message": "Target file not found; returning original list."}
+    
+    added_path = os.path.join(month_dir, f'{TXT_PREFIX}{date}.txt')
     
 
     # If the added_url file does not exist, return original list

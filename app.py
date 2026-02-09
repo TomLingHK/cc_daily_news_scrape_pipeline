@@ -70,6 +70,9 @@ def run_pipeline_and_callback(callback_url, func, *func_args, **func_kwargs):
 def trigger_check_added_url():
     """
     Check if url already existed in the txt file. Return url that are not existed in the txt file.
+        date(string): "20250905"
+        callback_url(string): "https://webhook.site/xxxx-xxxx-xxxx-xxxx"
+        input(list): [{"article_url": "https://example.com/news1"}, {"article_url": "https://example.com/news2"}]
     """
     data = request.get_json(silent=True) or {}
     if 'callback_url' not in data:
@@ -80,6 +83,9 @@ def trigger_check_added_url():
     callback_url = data['callback_url']
     date = data['date']
     input_payload = data.get('input', [])
+    
+    if (len(date)!=8) or (not date.isdigit()):
+        return jsonify({"error": "Invalid 'date' format. Expected 'YYYYMMDD'."}), 400
     
     thread = threading.Thread(
         target=run_pipeline_and_callback,
@@ -103,6 +109,9 @@ def trigger_check_added_url():
 def trigger_run():
     """
     The entry point for the web service. It receives the launch request.
+        date(string): "20250905"
+        callback_url(string): "https://webhook.site/xxxx-xxxx-xxxx-xxxx"
+        input(list): [{article_url: "xxx", ...}, {...}]
     """
     data = request.get_json(silent=True) or {}
     if 'callback_url' not in data:
@@ -113,6 +122,9 @@ def trigger_run():
     callback_url = data['callback_url']
     date = data['date']
     input_payload = data.get('input', [])
+    
+    if (len(date)!=8) or (not date.isdigit()):
+        return jsonify({"error": "Invalid 'date' format. Expected 'YYYYMMDD'."}), 400
     
     thread = threading.Thread(
         target=run_pipeline_and_callback,

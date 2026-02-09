@@ -120,15 +120,17 @@ Service will listen on `0.0.0.0:5000`.
 - If the container exits immediately, check `docker compose logs -f scraper`.
 - If the app cannot find the Excel file, ensure `NAS` contains `csv_template.csv` at the expected path or adjust `BASE_PATH` in `app.py`/`nas_output`/`update_csv.py`.
 
-- File structure:
+- File structure example:
 
 ```json
 /nas_output:
 |   csv_template.csv
 |   
 +---/output
-|       added_url_{date}.txt
-|       daily_news_{date}.csv
+    +---/2025
+        +---/05
+|           added_url_20250521.txt
+|           daily_news_20250521.csv
 |       
 ```
 
