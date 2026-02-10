@@ -1,15 +1,19 @@
 services:
   scraper:
-    image: "cc_daily_news_scrape"
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: cc_daily_news_scraper
+    restart: always
     ports:
       - "5000:5000"
-    env_file:
-      - stack.env
-    restart: on-failure
+    # env_file:
+    #   - stack.env
     networks:
       - n8n
     volumes:
-      - NAS:/app/nas_data
+      - NAS:/app/nas_data/pipeline_scrape_daily_news/
+      # - C:\Users\lscm-\Desktop\test_volume\nas_data:/app/nas_data
 
 volumes:
   NAS:

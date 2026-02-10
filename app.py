@@ -74,10 +74,14 @@ def trigger_check_added_url():
         callback_url(string): "https://webhook.site/xxxx-xxxx-xxxx-xxxx"
         input(list): [{"article_url": "https://example.com/news1"}, {"article_url": "https://example.com/news2"}]
     """
+    
+    print(f"BACKGROUND TASK STARTED for endpoint: /check_added_url")
     data = request.get_json(silent=True) or {}
     if 'callback_url' not in data:
+        print(f"callback_url missing in request body, returning error response.")
         return jsonify({"error": "Missing 'callback_url' in request body"}), 400
     if 'date' not in data:
+        print(f"date missing in request body, returning error response.")
         return jsonify({"error": "Missing 'date' in request body"}), 400
     
     callback_url = data['callback_url']
@@ -85,6 +89,7 @@ def trigger_check_added_url():
     input_payload = data.get('input', [])
     
     if (len(date)!=8) or (not date.isdigit()):
+        print(f"Invalid date format in request body, returning error response.")
         return jsonify({"error": "Invalid 'date' format. Expected 'YYYYMMDD'."}), 400
     
     thread = threading.Thread(
@@ -113,10 +118,14 @@ def trigger_run():
         callback_url(string): "https://webhook.site/xxxx-xxxx-xxxx-xxxx"
         input(list): [{article_url: "xxx", ...}, {...}]
     """
+    
+    print(f"BACKGROUND TASK STARTED for endpoint: /run")
     data = request.get_json(silent=True) or {}
     if 'callback_url' not in data:
+        print(f"callback_url missing in request body, returning error response.")
         return jsonify({"error": "Missing 'callback_url' in request body"}), 400
     if 'date' not in data:
+        print(f"date missing in request body, returning error response.")
         return jsonify({"error": "Missing 'date' in request body"}), 400
     
     callback_url = data['callback_url']
@@ -124,6 +133,7 @@ def trigger_run():
     input_payload = data.get('input', [])
     
     if (len(date)!=8) or (not date.isdigit()):
+        print(f"Invalid date format in request body, returning error response.")
         return jsonify({"error": "Invalid 'date' format. Expected 'YYYYMMDD'."}), 400
     
     thread = threading.Thread(

@@ -1,14 +1,14 @@
-# update_news_excel
+# News scraping
 
-Small Flask service to append and sort news links into an Excel sheet.
+Small Flask service to append news links and content into a csv file.
 
 **Files**
+- [.dockerignore](.dockerignore) — build context exclusions
 - [Dockerfile](Dockerfile) — image build
 - [docker-compose.yml](docker-compose.yml) — compose service stub (uses external `n8n` network and `NAS` volume)
 - [app.py](app.py) — Flask entrypoint and background worker
 - [checked_added_url.py](checked_added_url.py) - Check added news helper
-- [update_csv.py](update_csv.py) — Excel update helpers
-- [.dockerignore](.dockerignore) — build context exclusions
+- [update_csv.py](update_csv.py) — csv update helpers
 - [csv_template.csv](csv_template.csv) - Csv template with header
 
 **Prerequisites**
@@ -122,18 +122,16 @@ Service will listen on `0.0.0.0:5000`.
 
 - File structure example:
 
-```json
-/nas_output:
-|   csv_template.csv
-|   
-+---/output
-    +---/2025
-        +---/05
-|           added_url_20250521.txt
-|           daily_news_20250521.csv
-|       
 ```
-
+Example:
+nas_output
+├───csv_template.csv
+├───output
+│   └───2025
+│       └───05
+│           └───added_url_20250521.txt
+│           └───daily_news_20250521.csv
+```
 **Next steps / optional changes**
 - Switch `docker-compose.yml` to `build: .` to let compose build the image locally.
 - Add a healthcheck to the `Dockerfile` or `docker-compose.yml`.

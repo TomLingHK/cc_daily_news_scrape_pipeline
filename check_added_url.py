@@ -64,6 +64,7 @@ def check_added_url(app_const, input_data_list=None, date=None):
         if url is None or str(url) not in seen:
             result.append(item)
 
+    print(f"Returned {len(result)} items that are not in the added_url file.")
     return {"data": result, "message": "Task completed."}
 
 
