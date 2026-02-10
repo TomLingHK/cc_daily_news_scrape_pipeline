@@ -9,6 +9,8 @@ services:
       - "5000:5000"
     # env_file:
     #   - stack.env
+    environment:
+      - BASE_PATH=/app/nas_data/pipeline_scrape_daily_news/
     networks:
       - n8n
     volumes:
