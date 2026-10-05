@@ -10,6 +10,8 @@ Small Flask service to append news links and content into a csv file.
 - [checked_added_url.py](checked_added_url.py) - Check added news helper
 - [update_csv.py](update_csv.py) — csv update helpers
 - [csv_template.csv](csv_template.csv) - Csv template with header
+- [en_news_config.json](en_news_config.json) - Config for English news sources
+- [zh_news_config.json](zh_news_config.json) - Config for Chinese news sources
 
 **Prerequisites**
 - Docker / Docker Compose OR Python 3.11 and pip
@@ -61,38 +63,40 @@ Service will listen on `0.0.0.0:5000`.
 - POST `/run` — Launch a background job to append data to the Excel sheet. 
 - field:
   -  `date` is required (string, e.g. `20250905`). 
-  - `callback_url` is required. The service will POST a JSON payload to that URL when the job succeeds/fails.
   - `input` is a list of objects with `article_url`, `title`, `date`, `website_source` field.
-- Functionality: Update daily scraped news details. It will first check if the news are already added by checking `added_url_{date}.txt` file to prevent duplications. After the news are added into the `daily_news_{date}.csv` file, `added_url_{date}.txt` file would also be updated.
+  - `lang` (string, e.g. `en` or `zh`). The service will save the files in folder `/output/en` or `/output/zh`.
+- Functionality: Update daily scraped news details. It will first check if the news are already added by checking `added_url_{year}{month}.txt` file to prevent duplications. After the `daily_news_{year}{month}.csv` file is created / updated, `added_url_{year}{month}.txt` file would also be created / updated.
 - Example payload:
 ```json
 {
-  "callback_url": "https://example.com/webhook",
   "date": "20250905",
+  "lang": "zh",
   "input": [
-    {"title": "Title 1", "date": "2025-12-19", "article_url": "https://...", "website_source": "source"}
+    {"json": {"title": "Title 1", "date": "2025-12-19", "article_url": "https://...", "website_source": "source"}}
   ]
 }
 ```
 
-- POST `/check_added_url` — Check which input items are not recorded in the `added_url_{date}.txt` file.
+- POST `/check_added_url` — Check which input items are not recorded in the `added_url_{year}{month}.txt` file.
 - Purpose: return only items whose `article_url` are not present in the target added-URL file for the given date. If the file does not exist or cannot be read, the original input list is returned.
 - field:
   - `date` is required (string, e.g. `20250905`). 
-  - `callback_url` is required. The service will POST a JSON payload to that URL when the job succeeds/fails.
   - `input` is a list of objects with an `article_url` field.
+  - `lang` (string, e.g. `en` or `zh`). The service will check the files in folder `/output/en` or `/output/zh`.
 - Functionality: Check if the article is already added. It will return the item that article_url are not found in daily sheet. No files will be updated by calling this api endpoint.
 - Example request body:
 ```json
 {
-  "callback_url": "",
   "date": "20250905",
+  "lang": "zh",
   "input": [
-    {
-      "content": "...",
-      "title": "演藝學院：有關部門內部溝通未盡完善 團隊汲取經驗",
-      "date": "2025-09-05",
-      "article_url": "https://news.rthk.hk/rthk/ch/component/k2/1821433-20250905.htm?archive_date=2025-09-05"
+    "json": {
+      {
+        "content": "...",
+        "title": "演藝學院：有關部門內部溝通未盡完善 團隊汲取經驗",
+        "date": "2025-09-05",
+        "article_url": "https://news.rthk.hk/rthk/ch/component/k2/1821433-20250905.htm?archive_date=2025-09-05"
+      }
     }
   ]
 }
@@ -112,6 +116,24 @@ Service will listen on `0.0.0.0:5000`.
 }
 ```
 
+- GET `/news_config` — Return the news source configuration (e.g. which websites to scrape, and how) for a given language.
+- field:
+  - `lang` (string, e.g. `en` or `zh`). The service will return the corresponding config JSON content from `en_news_config.json` or `zh_news_config.json`.
+- Example request body:
+```json
+{
+  "lang": "en"
+}
+```
+
+<!-- - GET `/extract_prompt` — Retrieve the prompt for extracting and categorizing news content.
+  - Functionality: Returns the content of the `extract_content_prompt.txt` file as plain text. If the file is missing or cannot be read, an error is returned.
+  - Example response:
+    ```text
+    Successfully retrieved extract content prompt from /path/to/extract_content_prompt.txt.
+    [Prompt content here]
+    ``` -->
+
 **Compose volume & network notes**
 - `docker-compose.yml` mounts `NAS` into the container at `/app/nas_data`. Ensure that path and file permissions match your environment.
 - The compose file references an external network `n8n`. If you don't use it, either create it or remove the network reference.
@@ -119,6 +141,7 @@ Service will listen on `0.0.0.0:5000`.
 **Troubleshooting**
 - If the container exits immediately, check `docker compose logs -f scraper`.
 - If the app cannot find the Excel file, ensure `NAS` contains `csv_template.csv` at the expected path or adjust `BASE_PATH` in `app.py`/`nas_output`/`update_csv.py`.
+- Ensure config directory contains all files required as shown as file structure example below.
 
 - File structure example:
 
@@ -126,11 +149,14 @@ Service will listen on `0.0.0.0:5000`.
 Example:
 nas_output
 ├───csv_template.csv
+├───config
+│   └───en_news_config.json
+│   └───extract_content_prompt.txt
+│   └───zh_news_config.json
 ├───output
 │   └───2025
-│       └───05
-│           └───added_url_20250521.txt
-│           └───daily_news_20250521.csv
+│       └───added_url_202505.txt
+│       └───daily_news_202505.csv
 ```
 **Next steps / optional changes**
 - Switch `docker-compose.yml` to `build: .` to let compose build the image locally.

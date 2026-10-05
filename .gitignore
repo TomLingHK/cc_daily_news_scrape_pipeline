@@ -63,6 +63,7 @@ reports/
 tmp/
 daily_news_data/
 *.csv
+config_file/
 
 # Secrets and config
 .env
